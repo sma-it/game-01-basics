@@ -20,14 +20,14 @@ namespace MyGame
 
         int windowWidth = 1000;
         int windowHeight = 800;
+        bool screenToggle = false;
 
         public Game1()
         {
-            //graphics = new GraphicsDeviceManager(this);
-            //graphics.PreferredBackBufferWidth = windowWidth;
-            //graphics.PreferredBackBufferHeight = windowHeight;
-
             sGraphics = new GraphicsDeviceManager(this);
+            sGraphics.PreferredBackBufferWidth = windowWidth;
+            sGraphics.PreferredBackBufferHeight = windowHeight;
+
             Content.RootDirectory = "Content";
             sContent = Content;
         }
@@ -51,13 +51,15 @@ namespace MyGame
         /// </summary>
         protected override void LoadContent()
         {
+            Support.Camera.Setup();
+
             // Create a new SpriteBatch, which can be used to draw textures.
             sSpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Textures.Add(new Support.Texture("balloon", new Vector2(10, 10), new Vector2(30, 30)));
-            Textures.Add(new Support.Texture("balloon", new Vector2(200, 200), new Vector2(100, 100)));
-            Textures.Add(new Support.Texture("balloon", new Vector2(50, 10), new Vector2(30, 30)));
-            Textures.Add(new Support.Texture("balloon", new Vector2(50, 200), new Vector2(100, 100)));
+            Textures.Add(new Support.Texture("balloon", new Vector2(0, 0), new Vector2(0.3f, 0.3f)));
+            Textures.Add(new Support.Texture("balloon", new Vector2(-0.5f, -0.5f), new Vector2(0.3f, 0.3f)));
+            Textures.Add(new Support.Texture("balloon", new Vector2(0.7f, 0.7f), new Vector2(0.1f, 0.1f)));
+            Textures.Add(new Support.Texture("balloon", new Vector2(-0.5f, 0.5f), new Vector2(0.4f, 0.2f)));
 
             // TODO: use this.Content to load your game content here
             //player = new Player(this.Content, new Vector2(100, 100));
@@ -82,6 +84,17 @@ namespace MyGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if(!screenToggle && Keyboard.GetState().IsKeyDown(Keys.F11))
+            {
+                sGraphics.ToggleFullScreen();
+                screenToggle = true;
+            }
+
+            if(screenToggle && Keyboard.GetState().IsKeyUp(Keys.F11))
+            {
+                screenToggle = false;
+            }
+
             foreach (var key in Keyboard.GetState().GetPressedKeys())
             {
                 if (key == Keys.Space) selected++;
@@ -90,16 +103,26 @@ namespace MyGame
 
             var position = new Vector2();
             var scale = new Vector2();
+            var cam = new Vector2();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.W)) position.Y++;
-            if (Keyboard.GetState().IsKeyDown(Keys.S)) position.Y--;
-            if (Keyboard.GetState().IsKeyDown(Keys.A)) position.X--;
-            if (Keyboard.GetState().IsKeyDown(Keys.D)) position.X++;
+            if (Keyboard.GetState().IsKeyDown(Keys.W)) position.Y += 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.S)) position.Y -= 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.A)) position.X -= 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.D)) position.X += 0.01f;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up)) scale.Y++;
-            if (Keyboard.GetState().IsKeyDown(Keys.Down)) scale.Y--;
-            if (Keyboard.GetState().IsKeyDown(Keys.Left)) scale.X--;
-            if (Keyboard.GetState().IsKeyDown(Keys.Right)) scale.X++;
+            if (Keyboard.GetState().IsKeyDown(Keys.Up)) scale.Y += 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down)) scale.Y -= 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Left)) scale.X -= 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Right)) scale.X += 0.01f;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.I)) cam.Y += 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.K)) cam.Y -= 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.J)) cam.X -= 0.01f;
+            if (Keyboard.GetState().IsKeyDown(Keys.L)) cam.X += 0.01f;
+            Support.Camera.Move(cam);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.R)) Support.Camera.Zoom(0.01f);
+            if (Keyboard.GetState().IsKeyDown(Keys.T)) Support.Camera.Zoom(-0.01f);
 
             Textures[selected].Update(position, scale);
             // TODO: Add your update logic here

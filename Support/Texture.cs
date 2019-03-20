@@ -29,7 +29,7 @@ namespace MyGame.Support
 
         public void Draw()
         {
-            Rectangle destRect = new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)size.Y);
+            Rectangle destRect = Camera.ScreenRectangle(position, size);
             Game1.sSpriteBatch.Draw(image, destRect, Color.White);
         }
     }
