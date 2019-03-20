@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace MyGame
 {
@@ -9,13 +11,25 @@ namespace MyGame
     /// </summary>
     public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        public static GraphicsDeviceManager sGraphics;
+        public static SpriteBatch sSpriteBatch;
+        public static ContentManager sContent;
+
+        List<Support.Texture> Textures = new List<Support.Texture>();
+        int selected = 0;
+
+        int windowWidth = 1000;
+        int windowHeight = 800;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            //graphics = new GraphicsDeviceManager(this);
+            //graphics.PreferredBackBufferWidth = windowWidth;
+            //graphics.PreferredBackBufferHeight = windowHeight;
+
+            sGraphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            sContent = Content;
         }
 
         /// <summary>
@@ -38,9 +52,15 @@ namespace MyGame
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            sSpriteBatch = new SpriteBatch(GraphicsDevice);
+
+            Textures.Add(new Support.Texture("balloon", new Vector2(10, 10), new Vector2(30, 30)));
+            Textures.Add(new Support.Texture("balloon", new Vector2(200, 200), new Vector2(100, 100)));
+            Textures.Add(new Support.Texture("balloon", new Vector2(50, 10), new Vector2(30, 30)));
+            Textures.Add(new Support.Texture("balloon", new Vector2(50, 200), new Vector2(100, 100)));
 
             // TODO: use this.Content to load your game content here
+            //player = new Player(this.Content, new Vector2(100, 100));
         }
 
         /// <summary>
@@ -62,7 +82,28 @@ namespace MyGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            foreach (var key in Keyboard.GetState().GetPressedKeys())
+            {
+                if (key == Keys.Space) selected++;
+                if (selected >= Textures.Count) selected = 0;
+            }
+
+            var position = new Vector2();
+            var scale = new Vector2();
+
+            if (Keyboard.GetState().IsKeyDown(Keys.W)) position.Y++;
+            if (Keyboard.GetState().IsKeyDown(Keys.S)) position.Y--;
+            if (Keyboard.GetState().IsKeyDown(Keys.A)) position.X--;
+            if (Keyboard.GetState().IsKeyDown(Keys.D)) position.X++;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up)) scale.Y++;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down)) scale.Y--;
+            if (Keyboard.GetState().IsKeyDown(Keys.Left)) scale.X--;
+            if (Keyboard.GetState().IsKeyDown(Keys.Right)) scale.X++;
+
+            Textures[selected].Update(position, scale);
             // TODO: Add your update logic here
+            //player.Update();
 
             base.Update(gameTime);
         }
@@ -76,6 +117,9 @@ namespace MyGame
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            sSpriteBatch.Begin();
+            Textures.ForEach(texture => texture.Draw());
+            sSpriteBatch.End();
 
             base.Draw(gameTime);
         }
