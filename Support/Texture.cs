@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyGame.Support
 {
@@ -12,6 +8,7 @@ namespace MyGame.Support
     {
         Texture2D image;
         Vector2 position;
+        public Vector2 Position { get => position; }
         Vector2 size;
 
         public Texture(String image, Vector2 position, Vector2 size)

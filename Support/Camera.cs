@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyGame.Support
 {
@@ -33,7 +28,7 @@ namespace MyGame.Support
             sFocus.Y += delta.Y;
         }
 
-        static private Point ConvertToPosition(Vector2 value)
+        static public Point ConvertToPosition(Vector2 value)
         {
             Point point = new Point();
             point.X = (int)(value.X * sScale * sZoom);

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace MyGame
@@ -21,6 +22,8 @@ namespace MyGame
         int windowWidth = 1000;
         int windowHeight = 800;
         bool screenToggle = false;
+
+        Random random = new Random();
 
         public Game1()
         {
@@ -43,6 +46,8 @@ namespace MyGame
             // TODO: Add your initialization logic here
 
             base.Initialize();
+            Support.Camera.Setup();
+            Support.Font.Setup();
         }
 
         /// <summary>
@@ -51,8 +56,6 @@ namespace MyGame
         /// </summary>
         protected override void LoadContent()
         {
-            Support.Camera.Setup();
-
             // Create a new SpriteBatch, which can be used to draw textures.
             sSpriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -101,6 +104,16 @@ namespace MyGame
                 if (selected >= Textures.Count) selected = 0;
             }
 
+            if(Keyboard.GetState().IsKeyDown(Keys.N))
+            {
+                float size = 0.1f + (float)random.NextDouble() * 0.3f;
+                Textures.Add(new Support.Texture(
+                    "balloon", 
+                    new Vector2(-1 + (float)random.NextDouble() * 2, -1 + (float)random.NextDouble() * 2), 
+                    new Vector2(size)
+                ));
+            }
+
             var position = new Vector2();
             var scale = new Vector2();
             var cam = new Vector2();
@@ -142,6 +155,13 @@ namespace MyGame
             // TODO: Add your drawing code here
             sSpriteBatch.Begin();
             Textures.ForEach(texture => texture.Draw());
+
+            Support.Font.PrintStatus("Selected object is: " + selected + " Location=" + Textures[selected].Position, Color.Black);
+            Support.Font.PrintStatus2("Texture Count is: " + Textures.Count, Color.Pink);
+            Support.Font.PrintAt(Textures[selected].Position, "Selected", Color.Red);
+
+            Support.Font.PrintStatusLine("Line 2", 2, Color.Purple);
+            Support.Font.PrintStatusLine("Line 3", 3, Color.Purple);
             sSpriteBatch.End();
 
             base.Draw(gameTime);

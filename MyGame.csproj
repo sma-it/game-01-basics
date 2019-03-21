@@ -46,6 +46,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\Camera.cs" />
+    <Compile Include="Support\Font.cs" />
     <Compile Include="Support\Texture.cs" />
   </ItemGroup>
   <ItemGroup>
