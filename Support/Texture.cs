@@ -4,29 +4,31 @@ using System;
 
 namespace MyGame.Support
 {
-    class Texture
+    public class Texture
     {
         Texture2D image;
-        Vector2 position;
-        public Vector2 Position { get => position; }
-        Vector2 size;
+        public Vector2 Position;
+        public Vector2 size;
 
         public Texture(String image, Vector2 position, Vector2 size)
         {
             this.image = Game1.sContent.Load<Texture2D>(image);
-            this.position = position;
+            this.Position = position;
             this.size = size;
         }
 
+        public Vector2 MinBound { get => Position - (size * 0.5f); }
+        public Vector2 MaxBound { get => Position + (size * 0.5f); }
+
         public void Update(Vector2 deltaTranslate, Vector2 deltaScale)
         {
-            position += deltaTranslate;
+            Position += deltaTranslate;
             size += deltaScale;
         }
 
         public void Draw()
         {
-            Rectangle destRect = Camera.ScreenRectangle(position, size);
+            Rectangle destRect = Camera.ScreenRectangle(Position, size);
             Game1.sSpriteBatch.Draw(image, destRect, Color.White);
         }
     }

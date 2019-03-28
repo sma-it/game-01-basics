@@ -2,6 +2,7 @@
 
 namespace MyGame.Support
 {
+
     static public class Camera
     {
         static private float sScale;
@@ -28,6 +29,9 @@ namespace MyGame.Support
             sFocus.Y += delta.Y;
         }
 
+        static public Vector2 Min { get => new Vector2(-sOffset.X / sScale, -sOffset.Y / sScale); }
+        static public Vector2 Max { get => new Vector2(sOffset.X / sScale, sOffset.Y / sScale); }
+
         static public Point ConvertToPosition(Vector2 value)
         {
             Point point = new Point();
@@ -50,6 +54,19 @@ namespace MyGame.Support
             Point s = ConvertToSize(size);
 
             return new Rectangle(p - new Point(s.X / 2, s.Y / 2), s);
+        }
+
+        static public CollisionStatus GetCollision(Texture texture)
+        {
+            Vector2 min = Min;
+            Vector2 max = Max;
+
+            if (texture.MaxBound.Y > max.Y) return CollisionStatus.Top;
+            if (texture.MinBound.X < min.X) return CollisionStatus.Left;
+            if (texture.MaxBound.X > max.X) return CollisionStatus.Right;
+            if (texture.MinBound.Y < min.Y) return CollisionStatus.Bottom;
+
+            return CollisionStatus.Inside;
         }
     }
 }

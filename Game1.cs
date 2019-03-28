@@ -15,15 +15,13 @@ namespace MyGame
         public static GraphicsDeviceManager sGraphics;
         public static SpriteBatch sSpriteBatch;
         public static ContentManager sContent;
+        public static Random sRandom = new Random();
 
-        List<Support.Texture> Textures = new List<Support.Texture>();
-        int selected = 0;
+        List<Cow> Cows = new List<Cow>();
 
         int windowWidth = 1000;
         int windowHeight = 800;
-        bool screenToggle = false;
-
-        Random random = new Random();
+        bool spaceDown = false;
 
         public Game1()
         {
@@ -59,10 +57,7 @@ namespace MyGame
             // Create a new SpriteBatch, which can be used to draw textures.
             sSpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Textures.Add(new Support.Texture("balloon", new Vector2(0, 0), new Vector2(0.3f, 0.3f)));
-            Textures.Add(new Support.Texture("balloon", new Vector2(-0.5f, -0.5f), new Vector2(0.3f, 0.3f)));
-            Textures.Add(new Support.Texture("balloon", new Vector2(0.7f, 0.7f), new Vector2(0.1f, 0.1f)));
-            Textures.Add(new Support.Texture("balloon", new Vector2(-0.5f, 0.5f), new Vector2(0.4f, 0.2f)));
+            Cows.Add(new Cow(new Vector2(0, 0), 0.3f));
 
             // TODO: use this.Content to load your game content here
             //player = new Player(this.Content, new Vector2(100, 100));
@@ -87,59 +82,18 @@ namespace MyGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            if(!screenToggle && Keyboard.GetState().IsKeyDown(Keys.F11))
+            if(!spaceDown && Keyboard.GetState().IsKeyDown(Keys.Space))
             {
-                sGraphics.ToggleFullScreen();
-                screenToggle = true;
+                Cows.Add(new Cow(new Vector2(0, 0), 0.3f));
+                spaceDown = true;
+            }
+            if(spaceDown && Keyboard.GetState().IsKeyUp(Keys.Space))
+            {
+                spaceDown = false;
             }
 
-            if(screenToggle && Keyboard.GetState().IsKeyUp(Keys.F11))
-            {
-                screenToggle = false;
-            }
+            Cows.ForEach((cow) => cow.Update());
 
-            foreach (var key in Keyboard.GetState().GetPressedKeys())
-            {
-                if (key == Keys.Space) selected++;
-                if (selected >= Textures.Count) selected = 0;
-            }
-
-            if(Keyboard.GetState().IsKeyDown(Keys.N))
-            {
-                float size = 0.1f + (float)random.NextDouble() * 0.3f;
-                Textures.Add(new Support.Texture(
-                    "balloon", 
-                    new Vector2(-1 + (float)random.NextDouble() * 2, -1 + (float)random.NextDouble() * 2), 
-                    new Vector2(size)
-                ));
-            }
-
-            var position = new Vector2();
-            var scale = new Vector2();
-            var cam = new Vector2();
-
-            if (Keyboard.GetState().IsKeyDown(Keys.W)) position.Y += 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.S)) position.Y -= 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.A)) position.X -= 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.D)) position.X += 0.01f;
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Up)) scale.Y += 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.Down)) scale.Y -= 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.Left)) scale.X -= 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.Right)) scale.X += 0.01f;
-
-            if (Keyboard.GetState().IsKeyDown(Keys.I)) cam.Y += 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.K)) cam.Y -= 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.J)) cam.X -= 0.01f;
-            if (Keyboard.GetState().IsKeyDown(Keys.L)) cam.X += 0.01f;
-            Support.Camera.Move(cam);
-
-            if (Keyboard.GetState().IsKeyDown(Keys.R)) Support.Camera.Zoom(0.01f);
-            if (Keyboard.GetState().IsKeyDown(Keys.T)) Support.Camera.Zoom(-0.01f);
-
-            Textures[selected].Update(position, scale);
-            // TODO: Add your update logic here
-            //player.Update();
 
             base.Update(gameTime);
         }
@@ -154,14 +108,13 @@ namespace MyGame
 
             // TODO: Add your drawing code here
             sSpriteBatch.Begin();
-            Textures.ForEach(texture => texture.Draw());
+            Cows.ForEach(cow => cow.Draw());
 
-            Support.Font.PrintStatus("Selected object is: " + selected + " Location=" + Textures[selected].Position, Color.Black);
-            Support.Font.PrintStatus2("Texture Count is: " + Textures.Count, Color.Pink);
-            Support.Font.PrintAt(Textures[selected].Position, "Selected", Color.Red);
+            Support.Font.PrintStatus("First cow is at Location " + Cows[0].Position, Color.Black);
+            Support.Font.PrintStatus2("Cow Count is: " + Cows.Count, Color.Pink);
 
-            Support.Font.PrintStatusLine("Line 2", 2, Color.Purple);
-            Support.Font.PrintStatusLine("Line 3", 3, Color.Purple);
+            Support.Font.PrintStatusLine(Support.Camera.Min.ToString(), 2, Color.Purple);
+            Support.Font.PrintStatusLine(Support.Camera.Max.ToString(), 3, Color.Purple);
             sSpriteBatch.End();
 
             base.Draw(gameTime);
