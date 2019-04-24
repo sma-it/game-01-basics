@@ -9,15 +9,12 @@ namespace MyGame
 {
     public class Cow : Support.Texture
     {
-        public Vector2 PositionDelta;
+        Vector2 direction;
 
         public Cow(Vector2 position, float size) : base("Cow", position, new Vector2(size))
         {
-            PositionDelta.X = (float)(Game1.sRandom.NextDouble()) * 0.05f - 0.025f;
-            PositionDelta.Y = (float)(Game1.sRandom.NextDouble()) * 0.05f - 0.025f;
-            // If all cows must move equally fast, use the code below
-            //PositionDelta.X = 0.025f;
-            //PositionDelta = Vector2.Transform(PositionDelta, Matrix.CreateRotationZ((float)Game1.sRandom.NextDouble() * (float)Math.PI * 2));
+            direction.X = 1f;
+            direction = Vector2.Transform(direction, Matrix.CreateRotationZ((float)Game1.sRandom.NextDouble() * (float)Math.PI * 2));
         }
 
         public float Radius
@@ -26,21 +23,23 @@ namespace MyGame
             set => size.X = size.Y = value * 2f;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             var status = Support.Camera.GetCollision(this);
             switch (status)
             {
                 case Support.CollisionStatus.Bottom:
                 case Support.CollisionStatus.Top:
-                    PositionDelta.Y *= -1;
+                    direction.Y *= -1;
+                    Position += direction * (float)gameTime.ElapsedGameTime.TotalSeconds;
                     break;
                 case Support.CollisionStatus.Left:
                 case Support.CollisionStatus.Right:
-                    PositionDelta.X *= -1;
+                    direction.X *= -1;
+                    Position += direction * (float)gameTime.ElapsedGameTime.TotalSeconds;
                     break;
             }
-            Position += PositionDelta;
+            Position += direction * (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
     }
 }

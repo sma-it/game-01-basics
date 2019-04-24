@@ -17,11 +17,10 @@ namespace MyGame
         public static ContentManager sContent;
         public static Random sRandom = new Random();
 
-        List<Cow> Cows = new List<Cow>();
-
         int windowWidth = 1000;
         int windowHeight = 800;
-        bool spaceDown = false;
+
+        GameState gameState;
 
         public Game1()
         {
@@ -56,11 +55,7 @@ namespace MyGame
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             sSpriteBatch = new SpriteBatch(GraphicsDevice);
-
-            Cows.Add(new Cow(new Vector2(0, 0), 0.3f));
-
-            // TODO: use this.Content to load your game content here
-            //player = new Player(this.Content, new Vector2(100, 100));
+            gameState = new GameState();
         }
 
         /// <summary>
@@ -82,19 +77,7 @@ namespace MyGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            if(!spaceDown && Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                Cows.Add(new Cow(new Vector2(0, 0), 0.3f));
-                spaceDown = true;
-            }
-            if(spaceDown && Keyboard.GetState().IsKeyUp(Keys.Space))
-            {
-                spaceDown = false;
-            }
-
-            Cows.ForEach((cow) => cow.Update());
-
-
+            gameState.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -108,13 +91,7 @@ namespace MyGame
 
             // TODO: Add your drawing code here
             sSpriteBatch.Begin();
-            Cows.ForEach(cow => cow.Draw());
-
-            Support.Font.PrintStatus("First cow is at Location " + Cows[0].Position, Color.Black);
-            Support.Font.PrintStatus2("Cow Count is: " + Cows.Count, Color.Pink);
-
-            Support.Font.PrintStatusLine(Support.Camera.Min.ToString(), 2, Color.Purple);
-            Support.Font.PrintStatusLine(Support.Camera.Max.ToString(), 3, Color.Purple);
+            gameState.Draw(gameTime);
             sSpriteBatch.End();
 
             base.Draw(gameTime);

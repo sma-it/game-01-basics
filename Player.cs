@@ -5,25 +5,25 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MyGame
 {
-    class Player
+    public class Player : Support.Texture
     {
-        private Texture2D texture;
-        private Vector2 position;
-
-        public Player(ContentManager contentManager, Vector2 position)
+        public Player(Vector2 position) : base("fox", position, new Vector2(0.2f))
         {
-            texture = contentManager.Load<Texture2D>("balloon");
-            this.position = position;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.Right)) position.X++; 
-        }
+            Vector2 previousPos = Position;
+            if (Keyboard.GetState().IsKeyDown(Keys.Right)) Position.X += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Left)) Position.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Up)) Position.Y += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down)) Position.Y -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
 
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 0.3f, SpriteEffects.None, 0f);
+            var status = Support.Camera.GetCollision(this);
+            if (status != Support.CollisionStatus.Inside)
+            {
+                Position = previousPos;
+            }
         }
     }
 }
